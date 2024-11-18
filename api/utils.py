@@ -5,16 +5,19 @@ from typing import TYPE_CHECKING, Any, cast
 from uuid import UUID, uuid4
 
 import httpx
+from dependency_injector.wiring import Provide, inject
 from fastapi import HTTPException
 from httpx import AsyncClient, HTTPStatusError, RequestError
 from loguru import logger
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.config import Settings
 from api.crud import read_products, replace_offers
+from api.database import engine
+from api.dependencies import Container, _session
 from api.schemas.offer import Offer
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
-
     from api.schemas.product import ProductCreate
 
 
@@ -51,9 +54,9 @@ async def register_product(
     return product
 
 
+@inject
 async def fetch_product_offers(
-    product_id: UUID,
-    client: AsyncClient,
+    product_id: UUID, client=cast(AsyncClient, Provide[Container.client])
 ) -> list[Offer]:
     try:
         response = await client.get(f"/products/{product_id}/offers")
@@ -76,17 +79,19 @@ async def fetch_product_offers(
     return [Offer(**offer) for offer in cast(list[dict[str, Any]], response.json())]
 
 
+@inject
 async def fetch_loop(
-    interval: float,
-    session: AsyncSession,
-    client: AsyncClient,
+    settings=cast(Settings, Provide[Container.settings]),
+    session=cast(AsyncSession, Provide[Container.session]),
 ) -> None:
-    logger.info("fetching...")
-    products = await read_products(session=session)
-
     while True:
+        logger.info("Retching offers...")
+        products = await read_products()
+
         for product in products:
-            offers = await fetch_product_offers(product_id=product.id, client=client)
+            print(product.name)
+            offers = await fetch_product_offers(product_id=product.id)
+            print(offers)
             await replace_offers(product_id=product.id, offers=offers, session=session)
 
-        await sleep(interval)
+        await sleep(settings.refetch_interval)

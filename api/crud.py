@@ -1,18 +1,19 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING, Iterable, cast
 
+from dependency_injector.wiring import Provide, inject
 from fastapi import HTTPException
 from loguru import logger
-from sqlalchemy import Sequence, select
+from sqlalchemy import Sequence, delete, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.dependencies import Container
 from api.models import OfferORM, ProductORM
 
 if TYPE_CHECKING:
     from uuid import UUID
-
-    from sqlalchemy.ext.asyncio import AsyncSession
 
     from api.schemas.offer import Offer
     from api.schemas.product import ProductCreate
@@ -38,10 +39,13 @@ async def create_product(
     return product
 
 
-async def read_products(session: AsyncSession) -> Iterable[ProductORM]:
+@inject
+async def read_products(
+    session=cast(AsyncSession, Provide[Container.session]),
+) -> Iterable[ProductORM]:
     statement = select(ProductORM)
     scalars = await session.scalars(statement=statement)
-    return scalars.all()
+    return scalars.unique()
 
 
 async def read_product(product_id: UUID, session: AsyncSession) -> ProductORM:
@@ -89,26 +93,25 @@ async def read_offers(product_id: UUID, session: AsyncSession) -> Sequence[Offer
     return scalars.all()
 
 
+@inject
 async def replace_offers(
     product_id: UUID,
     offers: list[Offer],
-    session: AsyncSession,
+    session=cast(AsyncSession, Provide[Container.session]),
 ) -> None:
-    statement = select(OfferORM).where(OfferORM.product_id == product_id)
+    statement = delete(OfferORM).where(OfferORM.product_id == product_id)
     scalars = await session.scalars(statement)
-    existing_offers = scalars.all()
+    # existing_offers = scalars.all()
 
-    try:
-        for offer in existing_offers:
-            await session.delete(offer)
+    # for offer in existing_offers:
+    #     await session.delete(offer)
 
-        new_offers = [OfferORM(**offer.model_dump()) for offer in offers]
-        session.add_all(new_offers)
-        await session.commit()
-    except SQLAlchemyError as e:
-        logger.error(e)
-        await session.rollback()
-        raise HTTPException(status_code=500, detail="Could not replace offers") from e
+    new_offers = [
+        OfferORM(**offer.model_dump(), product_id=product_id) for offer in offers
+    ]
+    print(new_offers)
+    # session.add_all(new_offers)
+    await session.commit()
 
 
 # [

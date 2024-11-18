@@ -21,7 +21,7 @@ router = APIRouter()
 # TODO: add offers
 @router.get("", summary="Get all products and their offers")
 async def get_root_(session: SessionDep) -> list[ProductRead]:
-    products = await read_products(session=session)
+    products = await read_products()
     return [ProductRead.model_validate(product) for product in products]
 
 

@@ -1,13 +1,15 @@
+import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from api import crud, utils
 from api.client import client
 from api.config import settings
 from api.database import engine
+from api.dependencies import Container
 from api.models import Base
 from api.routers import health, products
 from api.utils import fetch_loop
@@ -15,16 +17,19 @@ from api.utils import fetch_loop
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator[FastAPI, None]:
+    container = Container()
+    container.wire(modules=[utils, crud])
+
     async with engine.begin() as connection:
         # await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
 
-    async with AsyncSession(engine) as session:
-        await fetch_loop(5.0, session=session, client=client)
+    asyncio.create_task(fetch_loop(), name="fetch_loop")
 
-    yield
-
-    await client.aclose()
+    try:
+        yield
+    finally:
+        await client.aclose()
 
 
 # ? root_path could be set in NGINX instead using .env

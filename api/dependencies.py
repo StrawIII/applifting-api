@@ -1,6 +1,8 @@
 from typing import Annotated, Any, AsyncGenerator
 from uuid import UUID
 
+from dependency_injector import providers
+from dependency_injector.containers import DeclarativeContainer
 from fastapi import Depends
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -40,3 +42,9 @@ SessionDep = Annotated[AsyncSession, Depends(_session)]
 ClientDep = Annotated[AsyncClient, Depends(_client)]
 ProductDep = Annotated[ProductORM, Depends(_product_by_name)]
 RegisteredProductDep = Annotated[ProductCreate, Depends(...)]
+
+
+class Container(DeclarativeContainer):
+    settings = providers.Singleton(_settings)
+    session = providers.Resource(_session)
+    client = providers.Singleton(_client)

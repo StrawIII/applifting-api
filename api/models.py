@@ -20,8 +20,7 @@ class ProductORM(Base):
     description: Mapped[str] = mapped_column(TEXT)
 
     offers: Mapped[list[OfferORM]] = relationship(
-        back_populates="product",
-        cascade="all, delete-orphan",
+        back_populates="product", cascade="all, delete-orphan", lazy="joined"
     )
 
 

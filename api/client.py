@@ -25,12 +25,12 @@ class BearerAuth(Auth):
         """
 
         request.headers["Bearer"] = self.access_token
-        logger.debug(self.access_token)
         response = yield request
 
         if response.status_code == httpx.codes.UNAUTHORIZED:
             # If the server issues a 401 UNAUTHORIZED response, then issue a request to
             # refresh the access token, and resend the request.
+            logger.info("Refreshing access token...")
             self.access_token = await self.fetch_access_token()
 
             request.headers["Bearer"] = self.access_token
