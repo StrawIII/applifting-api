@@ -10,10 +10,12 @@ from api.crud import (
     delete_product,
     read_product,
     read_products,
+    read_products_with_offers,
     update_product,
 )
 from api.schemas.offer import Offer
 from api.schemas.product import (
+    ProductCatalogue,
     ProductCreate,
     ProductDelete,
     ProductRead,
@@ -24,8 +26,21 @@ from api.utils import fetch_product_offers, register_product
 router = APIRouter()
 
 
-# TODO: add offers
-@router.get("", summary="Get all products and their offers")
+@router.get("/catalogue", summary="Get all products and their offers")
+async def get_catalogue_():
+    products = await read_products_with_offers()
+    return [
+        ProductCatalogue(
+            id=product.id,
+            name=product.name,
+            description=product.description,
+            offers=[Offer.model_validate(offer) for offer in product.offers],
+        )
+        for product in products
+    ]
+
+
+@router.get("", summary="Get all products")
 async def get_root_() -> list[ProductRead]:
     products = await read_products()
     return [ProductRead.model_validate(product) for product in products]
