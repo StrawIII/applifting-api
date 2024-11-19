@@ -36,8 +36,6 @@ async def create_product(
         await session.rollback()
         raise HTTPException from e
 
-    return product
-
 
 @inject
 async def read_products(
