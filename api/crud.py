@@ -23,8 +23,8 @@ if TYPE_CHECKING:
 
 async def create_product(
     product: ProductCreate,
-    session: AsyncSession,
 ) -> ProductCreate:
+    session=cast(AsyncSession, Provide[Container.session]),
     try:
         session.add(ProductORM(**product.model_dump()))
         await session.commit()
@@ -48,7 +48,10 @@ async def read_products(
     return scalars.unique()
 
 
-async def read_product(product_id: UUID, session: AsyncSession) -> ProductORM:
+@inject
+async def read_product(
+    product_id: UUID, session=cast(AsyncSession, Provide[Container.session])
+) -> ProductORM:
     statement = select(ProductORM).where(ProductORM.id == product_id)
     scalars = await session.scalars(statement)
     product = scalars.one_or_none()
@@ -59,10 +62,11 @@ async def read_product(product_id: UUID, session: AsyncSession) -> ProductORM:
     return product
 
 
+@inject
 async def update_product(
     product_id: UUID,
-    product: ProductORM,
-    session: AsyncSession,
+    product: ProductUpdate,
+    session=cast(AsyncSession, Provide[Container.session]),
 ) -> ProductORM:
     updated_product = await session.merge(
         ProductORM(
@@ -75,7 +79,10 @@ async def update_product(
     return updated_product
 
 
-async def delete_product(product: ProductORM, session: AsyncSession) -> ProductORM:
+@inject
+async def delete_product(
+    product: ProductORM, session=cast(AsyncSession, Provide[Container.session])
+) -> ProductORM:
     try:
         session.delete(product)
         session.commit()
@@ -87,7 +94,9 @@ async def delete_product(product: ProductORM, session: AsyncSession) -> ProductO
     return product
 
 
-async def read_offers(product_id: UUID, session: AsyncSession) -> Sequence[OfferORM]:
+@inject
+async def read_offers(
+    product_id: UUID, session=cast(AsyncSession, Provide[Container.session])
 ) -> Iterable[OfferORM]:
     statement = select(OfferORM).where(OfferORM.product_id == product_id)
     scalars = await session.scalars(statement)
@@ -110,25 +119,3 @@ async def replace_offers(
     new_offers = [
         OfferORM(**offer.model_dump(), product_id=product_id) for offer in offers
     ]
-    print(new_offers)
-    # session.add_all(new_offers)
-    await session.commit()
-
-
-# [
-#   {
-#     "id": "67ee0787-6b4e-2e87-44e6-c82d3fe8c053",
-#     "price": 17782,
-#     "items_in_stock": 336
-#   },
-#   {
-#     "id": "52b6d267-693a-b550-2d4a-f1276699501e",
-#     "price": 17295,
-#     "items_in_stock": 325
-#   },
-#   {
-#     "id": "72c3b061-989b-324b-ad19-2735a00c288d",
-#     "price": 17765,
-#     "items_in_stock": 32
-#   }
-# ]
