@@ -18,7 +18,7 @@ class ProductORM(Base):
     __tablename__ = "product"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True)
-    name: Mapped[str] = mapped_column(VARCHAR(50), unique=True)
+    name: Mapped[str] = mapped_column(VARCHAR(50))
     description: Mapped[str] = mapped_column(TEXT)
 
     offers: Mapped[list[OfferORM]] = relationship(
