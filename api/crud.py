@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.dependencies import Container
 from api.models import OfferORM, ProductORM
+from api.schemas.product import ProductUpdate
 
 if TYPE_CHECKING:
     from uuid import UUID
@@ -74,6 +75,7 @@ async def update_product(
         ),
     )
     await session.commit()
+    await session.refresh(updated_product)
     return updated_product
 
 
