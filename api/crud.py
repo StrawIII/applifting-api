@@ -27,11 +27,14 @@ async def create_product(
     session=cast(AsyncSession, Provide[Container.session]),
 ) -> ProductORM:
     try:
-        session.add(ProductORM(**product.model_dump()))
+        created_product = ProductORM(**product.model_dump())
+        session.add(created_product)
         await session.commit()
-
-    except IntegrityError:
-        pass
+        await session.refresh(created_product)
+        return created_product
+    except IntegrityError as e:
+        logger.error(e)
+        await session.rollback()
     except SQLAlchemyError as e:
         logger.error(e)
         await session.rollback()
@@ -44,7 +47,7 @@ async def read_products(
 ) -> Iterable[ProductORM]:
     statement = select(ProductORM)
     scalars = await session.scalars(statement=statement)
-    return scalars.unique()
+    return scalars.all()
 
 
 @inject
