@@ -101,7 +101,6 @@ async def delete_product(
     try:
         await session.delete(product)
         await session.commit()
-        await session.refresh(product)
     except SQLAlchemyError as e:
         logger.error(e)
         session.rollback()
