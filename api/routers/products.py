@@ -45,14 +45,15 @@ async def get_product_(product_id: UUID, session: SessionDep) -> ProductRead:
     return ProductRead.model_validate(product)
 
 
-# TODO: finish
+# ? product_id query param coud be in body (kept as query param for consistent API)
 @router.put("/{product_id}", summary="Update a product")
 async def put_product_(
     product_id: UUID,
     product_: ProductUpdate,
     session: SessionDep,
 ):
-    product = await read_product(product_id=product_id, session=session)
+    updated_product = await update_product(product_id=product_id, product=product)
+    return ProductUpdate.model_validate(updated_product)
 
 
 @router.delete("/{product_id}", summary="Delete a product")
