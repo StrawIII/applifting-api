@@ -85,13 +85,11 @@ async def fetch_loop(
     session=cast(AsyncSession, Provide[Container.session]),
 ) -> None:
     while True:
-        logger.info("Retching offers...")
         products = await read_products()
 
         for product in products:
-            print(product.name)
+            logger.info(f"fetching offers for product {product.name}")
             offers = await fetch_product_offers(product_id=product.id)
-            print(offers)
             await replace_offers(product_id=product.id, offers=offers, session=session)
 
         await sleep(settings.refetch_interval)
