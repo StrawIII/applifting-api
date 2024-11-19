@@ -14,12 +14,12 @@ from api.models import Base
 from api.routers import health, products
 from api.utils import fetch_loop
 
+container = Container()
+container.wire(modules=[utils, crud])
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator[FastAPI, None]:
-    container = Container()
-    container.wire(modules=[utils, crud])
-
     async with engine.begin() as connection:
         # await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
