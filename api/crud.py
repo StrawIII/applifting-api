@@ -23,8 +23,8 @@ if TYPE_CHECKING:
 
 async def create_product(
     product: ProductCreate,
-) -> ProductCreate:
     session=cast(AsyncSession, Provide[Container.session]),
+) -> ProductORM:
     try:
         session.add(ProductORM(**product.model_dump()))
         await session.commit()
