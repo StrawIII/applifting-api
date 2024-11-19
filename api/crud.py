@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 # TODO: implement more sofisticated Exception handling
 
 
+@inject
 async def create_product(
     product: ProductCreate,
     session=cast(AsyncSession, Provide[Container.session]),
