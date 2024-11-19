@@ -39,6 +39,7 @@ class BearerAuth(Auth):
         if response.status_code == httpx.codes.BAD_REQUEST:
             # tried to fetch a new access token while a valid access token still exists
             # possible fix: save last access token in the database or a file
+            logger.error("cannot obtain an access token when valid one still exists")
             raise HTTPException(
                 status_code=502,
                 detail="Cannot obtain a new access token. Please try again later.",
