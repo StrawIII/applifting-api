@@ -2,13 +2,24 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, field_serializer
+from pydantic import BaseModel, ConfigDict, Field, field_serializer
 
 from api.schemas.offer import Offer
 
 
 class ProductBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+
+
+class ProductCatalogue(ProductBase):
+    id: UUID
+    name: str
+    description: str
+    offers: list[Offer]
+
+    @field_serializer("id")
+    def serialize_id(self, value: UUID) -> str:
+        return str(value)
 
 
 class ProductCreate(ProductBase):
