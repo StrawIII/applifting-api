@@ -128,12 +128,11 @@ async def replace_offers(
     await session.execute(statement)
 
     new_offers = [
-        session.add(OfferORM(**offer.model_dump(), product_id=product_id))
+        OfferORM(**offer.model_dump(), product_id=product_id)
         for offer in offers
         if offer.items_in_stock > 0
     ]
-    # ! running "session.add_all(new_offers)" causes SAWarning: Usage of the 'Session.add_all()' operation is not currently supported within the execution stage of the flush process.
-    # session.add_all(new_offers)
+    session.add_all(new_offers)
     # ! running "await session.commit()" raises sqlalchemy.exc.MissingGreenlet: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)
     # await session.commit()
     # !
