@@ -13,17 +13,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.config import Settings
 from api.crud import read_products, replace_offers
-from api.database import engine
-from api.dependencies import Container, _session
+from api.dependencies import Container
 from api.schemas.offer import Offer
 
 if TYPE_CHECKING:
     from api.schemas.product import ProductCreate
 
 
+@inject
 async def register_product(
     product: ProductCreate,
-    client: AsyncClient,
+    client=cast(AsyncClient, Provide[Container.client]),
 ) -> ProductCreate:
     try:
         response = await client.post(
@@ -49,7 +49,7 @@ async def register_product(
 
         if e.response.status_code == httpx.codes.CONFLICT:
             product.id = uuid4()
-            product = await register_product(product=product, client=client)
+            product = await register_product(product=product)
 
     return product
 
@@ -90,6 +90,7 @@ async def fetch_loop(
         for product in products:
             logger.info(f"fetching offers for product {product.name}")
             offers = await fetch_product_offers(product_id=product.id)
-            await replace_offers(product_id=product.id, offers=offers, session=session)
+            await replace_offers(product_id=product.id, offers=offers)
 
+        await session.commit()
         await sleep(settings.refetch_interval)
