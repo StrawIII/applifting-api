@@ -108,12 +108,14 @@ async def replace_offers(
     session=cast(AsyncSession, Provide[Container.session]),
 ) -> Iterable[OfferORM]:
     statement = delete(OfferORM).where(OfferORM.product_id == product_id)
-    scalars = await session.scalars(statement)
-    # existing_offers = scalars.all()
-
-    # for offer in existing_offers:
-    #     await session.delete(offer)
+    await session.execute(statement)
 
     new_offers = [
-        OfferORM(**offer.model_dump(), product_id=product_id) for offer in offers
+        session.add(OfferORM(**offer.model_dump(), product_id=product_id))
+        for offer in offers
+        if offer.items_in_stock > 0
     ]
+    # ! running "await session.commit()" HERE raises sqlalchemy.exc.MissingGreenlet: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)
+    # await session.commit()
+    # !
+    return new_offers
