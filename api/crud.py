@@ -82,8 +82,9 @@ async def delete_product(
     product: ProductORM, session=cast(AsyncSession, Provide[Container.session])
 ) -> ProductORM:
     try:
-        session.delete(product)
-        session.commit()
+        await session.delete(product)
+        await session.commit()
+        await session.refresh(product)
     except SQLAlchemyError as e:
         logger.error(e)
         session.rollback()
