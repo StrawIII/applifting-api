@@ -8,6 +8,7 @@ from loguru import logger
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from api.dependencies import Container
 from api.models import OfferORM, ProductORM
@@ -48,6 +49,16 @@ async def read_products(
 ) -> Iterable[ProductORM]:
     statement = select(ProductORM)
     scalars = await session.scalars(statement=statement)
+    return scalars.all()
+
+
+@inject
+async def read_products_with_offers(
+    session=cast(AsyncSession, Provide[Container.session]),
+) -> Iterable[ProductORM]:
+    statement = select(ProductORM).options(selectinload(ProductORM.offers))
+    scalars = await session.scalars(statement=statement)
+
     return scalars.all()
 
 
