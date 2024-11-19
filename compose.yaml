@@ -1,17 +1,17 @@
 services:
   api:
-    build: backend
+    build: .
     restart: always
     volumes:
       - /etc/localtime:/etc/localtime:ro
     environment:
-      - JWT_KEY=${JWT_KEY}
-      - COOKIE_KEY=${COOKIE_KEY}
-      - POSTGRES_HOST=postgres
+      - APPLIFTING_API_BASE_URL=${APPLIFTING_API_BASE_URL}
+      - APPLIFTING_API_REFRESH_TOKEN=${APPLIFTING_API_REFRESH_TOKEN}
+      - POSTGRES_HOST=${POSTGRES_HOST}
       - POSTGRES_PORT=${POSTGRES_PORT}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_DATABASE=${POSTGRES_DATABASE}
     healthcheck:
       test:
         [
@@ -23,8 +23,6 @@ services:
       interval: ${INTERVAL}
       timeout: ${TIMEOUT}
       retries: ${RETRIES}
-    depends_on:
-      - postgres
   nginx:
     image: nginx:1.27
     restart: always
