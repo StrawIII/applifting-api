@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Iterable, cast
 from dependency_injector.wiring import Provide, inject
 from fastapi import HTTPException
 from loguru import logger
-from sqlalchemy import Sequence, delete, select
+from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -88,6 +88,7 @@ async def delete_product(product: ProductORM, session: AsyncSession) -> ProductO
 
 
 async def read_offers(product_id: UUID, session: AsyncSession) -> Sequence[OfferORM]:
+) -> Iterable[OfferORM]:
     statement = select(OfferORM).where(OfferORM.product_id == product_id)
     scalars = await session.scalars(statement)
     return scalars.all()
@@ -98,7 +99,7 @@ async def replace_offers(
     product_id: UUID,
     offers: list[Offer],
     session=cast(AsyncSession, Provide[Container.session]),
-) -> None:
+) -> Iterable[OfferORM]:
     statement = delete(OfferORM).where(OfferORM.product_id == product_id)
     scalars = await session.scalars(statement)
     # existing_offers = scalars.all()
