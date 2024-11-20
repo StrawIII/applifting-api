@@ -10,9 +10,9 @@ from api.config import settings
 
 class BearerAuth(Auth):
     def __init__(self, base_url: str, refresh_token: str) -> None:
-        self.access_token = ""
         self.base_url = base_url
         self.refresh_token = refresh_token
+        self.access_token = ""
 
     async def async_auth_flow(
         self,
