@@ -16,6 +16,8 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-✔-blue)
 
 ### 👷 **Deployed demo**: [https://applifting-api.onrender.com](https://applifting-api.onrender.com) 
+Docs (Swagger): [https://applifting-api.onrender.com/docs](https://applifting-api.onrender.com/docs) 
+
 🚨ATTENTION: first request might take up to a minute due to server spin up🚨
 
 ## Overview
