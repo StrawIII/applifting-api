@@ -1,7 +1,7 @@
 # TODO
-- [ ] Deploy on render.com
+- [x] Deploy on render.com
   - [x] PostgreSQL
-  - [ ] API
+  - [x] API
 - [ ] Improve logging and exception handling
 - [ ] Implement simple AUTH
 - [ ] Add more tests
@@ -14,6 +14,9 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-✔-green)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-✔-blue)
+
+### 👷 **Deployed demo**: [https://applifting-api.onrender.com](https://applifting-api.onrender.com) 
+🚨ATTENTION: first request might take up to a minute due to server spin up🚨
 
 ## Overview
 
