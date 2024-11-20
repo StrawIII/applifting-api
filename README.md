@@ -5,7 +5,7 @@
 - [ ] Improve logging and exception handling
 - [ ] Implement simple AUTH
 - [ ] Add more tests
-- [ ] Implement tox
+- [x] Implement tox
 - [ ] Implement alembic
 
 # Applifting API
