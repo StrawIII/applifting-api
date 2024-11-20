@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -50,9 +51,12 @@ async def get_root_() -> list[ProductRead]:
 async def post_root_(
     product: ProductCreate,
 ) -> ProductCreate:
-    registered_product = await register_product(product=product)
+    if os.getenv("ENVIRONMENT") != "testing":
+        registered_product = await register_product(product=product)
+    else:
+        registered_product = product
+
     created_product = await create_product(product=registered_product)
-    logger.info(created_product.name)
     return ProductCreate.model_validate(created_product)
 
 

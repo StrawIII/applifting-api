@@ -1,8 +1,9 @@
 import asyncio
+import os
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Coroutine
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from api import crud, utils
@@ -24,7 +25,8 @@ async def lifespan(_: FastAPI) -> AsyncGenerator[FastAPI, None]:
         # await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
 
-    asyncio.create_task(fetch_loop(), name="fetch_loop")
+    if os.getenv("ENVIRONMENT") != "testing":
+        asyncio.create_task(fetch_loop(), name="fetch_loop")
 
     try:
         yield
@@ -49,3 +51,11 @@ app.add_middleware(
 
 app.include_router(health.router, prefix="/health", tags=["health"])
 app.include_router(products.router, prefix="/products", tags=["products"])
+
+
+# @app.middleware("http")
+# async def logging_middleware(
+#     request: Request, call_next: Coroutine[None, Request, Response]
+# ):
+#     request_body = await request.body()
+#     response = await call_next(request)
