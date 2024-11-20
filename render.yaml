@@ -1,8 +1,7 @@
-# Exported from Render on 2024-11-20T18:41:37Z
 services:
   - type: web
     name: applifting-api
-    runtime: python
+    runtime: docker
     repo: https://github.com/StrawIII/applifting-api
     plan: free
     envVars:
@@ -27,6 +26,7 @@ services:
       - key: APPLIFTING_API_BASE_URL
         sync: false
     region: frankfurt
-    buildCommand: pip3 install uv
-    startCommand: uv run uvicorn api.main:app --host 0.0.0.0
+    healthCheckPath: /api/v1/health
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
 version: "1"
