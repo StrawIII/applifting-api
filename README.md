@@ -1,3 +1,11 @@
+# TODO
+- [ ] Deploy on render.com
+  - [x] PostgreSQL
+  - [ ] API
+- [ ] Improve logging and exception handling
+- [ ] Implement simple AUTH
+- [ ] Add more tests
+
 # Applifting API
 
 ![License](https://img.shields.io/github/license/StrawIII/applifting-api)
