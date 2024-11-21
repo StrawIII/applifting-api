@@ -19,7 +19,7 @@ router = APIRouter()
 @inject
 async def get_root(session: AsyncSession = Depends(Provide[Container.session])) -> None:
     try:
-        await asyncio.wait_for(session.execute(text("SELECT 1;")), timeout=5)
+        await asyncio.wait_for(session.execute(text("SELECT 1;")), timeout=10)
     except (asyncio.TimeoutError, OperationalError) as e:
         raise HTTPException(
             status_code=503,
