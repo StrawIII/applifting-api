@@ -13,6 +13,15 @@ jobs:
         os: ubuntu-latest
         python-version: ["3.10", "3.11", "3.12", "3.13"]
 
+    env:
+      APPLIFTING_API_BASE_URL: ${{ secrets.APPLIFTING_API_BASE_URL }}
+      APPLIFTING_API_REFRESH_TOKEN: ${{ secrets.APPLIFTING_API_REFRESH_TOKEN }}
+      POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+      POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -27,16 +36,6 @@ jobs:
 
       - name: Install the project
         run: uv sync --all-extras --dev
-
-      - name: Load environment variables
-        env:
-          APPLIFTING_API_BASE_URL: ${{ secrets.APPLIFTING_API_BASE_URL }}
-          APPLIFTING_API_REFRESH_TOKEN: ${{ secrets.APPLIFTING_API_REFRESH_TOKEN }}
-          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
 
       - name: Run tests
         run: uv run tox
