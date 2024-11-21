@@ -9,7 +9,7 @@ from api.main import app
 
 @pytest.fixture(scope="session")
 def test_client() -> Generator[TestClient, Any, None]:
-    with TestClient(app) as client:
+    with TestClient(app, base_url="http://testserver/api/v1") as client:
         yield client
 
 
@@ -17,7 +17,7 @@ def test_client() -> Generator[TestClient, Any, None]:
 def test_product_id(test_client) -> Generator[UUID, Any, None]:
     product_id = uuid4()
     test_client.post(
-        "/api/v1/products",
+        "/products",
         json={
             "id": str(product_id),
             "name": "Tablet",
@@ -26,4 +26,4 @@ def test_product_id(test_client) -> Generator[UUID, Any, None]:
     )
     yield product_id
     # if not testing in a container
-    test_client.delete(f"/api/v1/products/{product_id}")
+    test_client.delete(f"/products/{product_id}")
