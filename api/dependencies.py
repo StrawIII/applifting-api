@@ -30,3 +30,6 @@ class Container(DeclarativeContainer):
     settings = Singleton(lambda: settings)
     session = Resource(_session)
     client = Singleton(lambda: client)
+
+
+class TestContainer(DeclarativeContainer): ...
