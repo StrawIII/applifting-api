@@ -1,17 +1,16 @@
 import asyncio
 import os
+import subprocess
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Coroutine
+from typing import AsyncGenerator
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api import crud, utils
 from api.client import client
 from api.config import settings
-from api.database import engine
 from api.dependencies import Container
-from api.models import Base
 from api.routers import health, products
 from api.utils import fetch_loop
 
@@ -21,9 +20,7 @@ container.wire(modules=[utils, crud, health])
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator[FastAPI, None]:
-    async with engine.begin() as connection:
-        # await connection.run_sync(Base.metadata.drop_all)
-        await connection.run_sync(Base.metadata.create_all)
+    subprocess.run(["alembic", "upgrade", "head"], check=True)
 
     if os.getenv("ENVIRONMENT") != "testing":
         asyncio.create_task(fetch_loop(), name="fetch_loop")
