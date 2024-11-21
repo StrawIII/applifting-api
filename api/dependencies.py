@@ -4,12 +4,10 @@ from uuid import UUID
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Resource, Singleton
 from fastapi import Depends, HTTPException
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.client import client
 from api.config import settings
-from api.models import ProductORM
 
 
 async def _session() -> AsyncGenerator[AsyncSession, Any]:
