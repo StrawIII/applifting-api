@@ -1,7 +1,7 @@
 import os
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from loguru import logger
 
 from api.crud import (
@@ -12,6 +12,7 @@ from api.crud import (
     read_products_with_offers,
     update_product,
 )
+from api.dependencies import product_exists
 from api.schemas.offer import Offer
 from api.schemas.product import (
     ProductCatalogue,
@@ -58,14 +59,18 @@ async def post_root_(
     return ProductCreate.model_validate(created_product)
 
 
-@router.get("/{product_id}", summary="Get a product")
+@router.get(
+    "/{product_id}", dependencies=[Depends(product_exists)], summary="Get a product"
+)
 async def get_product_(product_id: UUID) -> ProductRead:
     product = await read_product(product_id=product_id)
     return ProductRead.model_validate(product)
 
 
 # ? product_id query param coud be in body (kept as query param for consistent API)
-@router.put("/{product_id}", summary="Update a product")
+@router.put(
+    "/{product_id}", dependencies=[Depends(product_exists)], summary="Update a product"
+)
 async def put_product_(
     product_id: UUID,
     product: ProductUpdate,
@@ -74,14 +79,20 @@ async def put_product_(
     return ProductUpdate.model_validate(updated_product)
 
 
-@router.delete("/{product_id}", summary="Delete a product")
+@router.delete(
+    "/{product_id}", dependencies=[Depends(product_exists)], summary="Delete a product"
+)
 async def delete_product_(product_id: UUID) -> ProductDelete:
     product = await read_product(product_id=product_id)
     deleted_product = await delete_product(product=product)
     return ProductDelete.model_validate(deleted_product)
 
 
-@router.get("/{product_id}/offers", summary="Get product offers")
+@router.get(
+    "/{product_id}/offers",
+    dependencies=[Depends(product_exists)],
+    summary="Get product offers",
+)
 async def get_products_offers(product_id: UUID) -> list[Offer]:
     return [
         Offer.model_validate(offer)

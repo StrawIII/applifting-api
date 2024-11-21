@@ -3,7 +3,8 @@ from uuid import UUID
 
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Resource, Singleton
-from fastapi import Depends
+from fastapi import Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.client import client
@@ -18,14 +19,16 @@ async def _session() -> AsyncGenerator[AsyncSession, Any]:
         yield session
 
 
-async def _product_by_name(product_id: UUID, session: "SessionDep") -> ProductORM:
-    from api.crud import read_product
+async def product_exists(product_id: UUID, session: "SessionDep") -> None:
+    statement = select(ProductORM).where(ProductORM.id == product_id)
+    scalars = await session.scalars(statement)
+    product = scalars.one_or_none()
 
-    return await read_product(product_if=product_id, session=session)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
 
 
 SessionDep = Annotated[AsyncSession, Depends(_session)]
-ProductDep = Annotated[ProductORM, Depends(_product_by_name)]
 
 
 class Container(DeclarativeContainer):
