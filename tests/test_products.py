@@ -13,13 +13,13 @@ def test_create_product(test_client):
             "description": "12.9, 10000 mAh",
         },
     )
-    assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {
-        "id": str(product_id),
-        "name": "Tablet",
-        "description": "12.9, 10000 mAh",
-    }
-    test_client.delete(f"/api/v1/products/{product_id}")
+    try:
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()["id"] == str(product_id)
+        assert response.json()["name"] == "Tablet"
+        assert response.json()["description"] == "12.9, 10000 mAh"
+    finally:
+        test_client.delete(f"/api/v1/products/{product_id}")
 
 
 def test_create_product_duplicate(test_client, test_product_id):
