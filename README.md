@@ -4,7 +4,7 @@
   - [x] API
 - [ ] Improve logging and exception handling
 - [ ] Implement simple AUTH
-- [ ] Add more tests
+- [x] Add more tests
 - [x] Implement tox
 - [ ] Implement alembic
 
