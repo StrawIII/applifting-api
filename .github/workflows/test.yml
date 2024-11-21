@@ -31,8 +31,6 @@ jobs:
         uses: astral-sh/setup-uv@v3
       - name: Install tox
         run: uv tool install tox --with tox-uv --with tox-gh
-      - name: Install Python
-        run: uv python install --python-preference only-managed ${{ matrix.python-version }}
       - name: Setup test suite
         run: tox run -vv --skip-missing-interpreters false
         env:
