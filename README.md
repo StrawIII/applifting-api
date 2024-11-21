@@ -6,7 +6,7 @@
 - [ ] Implement simple AUTH
 - [x] Add more tests
 - [x] Implement tox
-- [ ] Implement alembic
+- [x] Implement alembic
 
 # Applifting API
 
