@@ -7,9 +7,14 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import HTTPException
 from loguru import logger
 from sqlalchemy import delete, select
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import (
+    DatabaseError,
+    IntegrityError,
+    SQLAlchemyError,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from sqlalchemy.orm.exc import StaleDataError
 
 from api.dependencies import Container
 from api.models import OfferORM, ProductORM
@@ -31,15 +36,23 @@ async def create_product(
         await session.refresh(created_product)
         return created_product
     except IntegrityError as e:
-        logger.error(e)
+        logger.error(f"Integrity error while creating product: {e}")
         await session.rollback()
-        raise HTTPException(status_code=409, detail="Product ID already exists") from e
+        raise HTTPException(
+            status_code=409, detail="Product with this ID already exists"
+        ) from e
+    except DatabaseError as e:
+        logger.error(f"Database error while creating product: {e}")
+        await session.rollback()
+        raise HTTPException(
+            status_code=500, detail="Database error occurred while creating the product"
+        ) from e
     except SQLAlchemyError as e:
-        logger.error(e)
+        logger.error(f"Unexpected SQLAlchemy error while creating product: {e}")
         await session.rollback()
         raise HTTPException(
             status_code=500,
-            detail="Error while creating the product. Please try again later.",
+            detail="An unexpected error occurred while creating the product",
         ) from e
 
 
@@ -66,10 +79,17 @@ async def read_products_with_offers(
 async def read_product(
     product_id: UUID, session=cast(AsyncSession, Provide[Container.session])
 ) -> ProductORM:
-    statement = select(ProductORM).where(ProductORM.id == product_id)
-    scalars = await session.scalars(statement)
-    product = scalars.one_or_none()
-    return product
+    try:
+        statement = select(ProductORM).where(ProductORM.id == product_id)
+        scalars = await session.scalars(statement)
+        product = scalars.one_or_none()
+    except SQLAlchemyError as e:
+        logger.error(f"Database error while reading product {product_id}: {e}")
+        raise HTTPException(
+            status_code=500, detail="Error occurred while fetching the product"
+        ) from e
+    else:
+        return product
 
 
 @inject
@@ -78,16 +98,37 @@ async def update_product(
     product: ProductUpdateIn,
     session=cast(AsyncSession, Provide[Container.session]),
 ) -> ProductORM:
-    updated_product = await session.merge(
-        ProductORM(
-            id=product_id,
-            name=product.name,
-            description=product.description,
-        ),
-    )
-    await session.commit()
-    await session.refresh(updated_product)
-    return updated_product
+    try:
+        updated_product = await session.merge(
+            ProductORM(
+                id=product_id,
+                name=product.name,
+                description=product.description,
+            ),
+        )
+        await session.commit()
+        await session.refresh(updated_product)
+    except StaleDataError as e:
+        logger.error(f"Concurrent update detected for product {product_id}: {e}")
+        await session.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="Product was modified by another request. Please try again",
+        ) from e
+    except IntegrityError as e:
+        logger.error(f"Integrity error while updating product {product_id}: {e}")
+        await session.rollback()
+        raise HTTPException(
+            status_code=409, detail="Update violates database constraints"
+        ) from e
+    except SQLAlchemyError as e:
+        logger.error(f"Database error while updating product {product_id}: {e}")
+        await session.rollback()
+        raise HTTPException(
+            status_code=500, detail="Error occurred while updating the product"
+        ) from e
+    else:
+        return updated_product
 
 
 @inject
@@ -97,12 +138,20 @@ async def delete_product(
     try:
         await session.delete(product)
         await session.commit()
+    except IntegrityError as e:
+        logger.error(f"Integrity error while deleting product {product.id}: {e}")
+        await session.rollback()
+        raise HTTPException(
+            status_code=409, detail="Cannot delete product due to existing references"
+        ) from e
     except SQLAlchemyError as e:
-        logger.error(e)
-        session.rollback()
-        raise HTTPException(status_code=500, detail="Could not delete product") from e
-
-    return product
+        logger.error(f"Database error while deleting product {product.id}: {e}")
+        await session.rollback()
+        raise HTTPException(
+            status_code=500, detail="Error occurred while deleting the product"
+        ) from e
+    else:
+        return product
 
 
 @inject
@@ -120,20 +169,30 @@ async def replace_offers(
     offers: list[Offer],
     session=cast(AsyncSession, Provide[Container.session]),
 ) -> Iterable[OfferORM]:
-    statement = delete(OfferORM).where(OfferORM.product_id == product_id)
-    await session.execute(statement)
+    try:
+        statement = delete(OfferORM).where(OfferORM.product_id == product_id)
+        await session.execute(statement)
 
-    new_offers = [
-        OfferORM(
-            **offer.model_dump(exclude={"id"}),
-            id=offer.id if isinstance(offer.id, UUID) else UUID(offer.id),
-            product_id=product_id,
+        new_offers = [
+            OfferORM(
+                **offer.model_dump(exclude={"id"}),
+                id=offer.id if isinstance(offer.id, UUID) else UUID(offer.id),
+                product_id=product_id,
+            )
+            for offer in offers
+            if offer.items_in_stock > 0
+        ]
+        session.add_all(new_offers)
+        await session.commit()
+    except IntegrityError as e:
+        logger.error(
+            f"Integrity error while replacing offers for product {product_id}: {e}"
         )
-        for offer in offers
-        if offer.items_in_stock > 0
-    ]
-    session.add_all(new_offers)
-    # ! running "await session.commit()" raises sqlalchemy.exc.MissingGreenlet: greenlet_spawn has not been called; can't call await_only() here. Was IO attempted in an unexpected place? (Background on this error at: https://sqlalche.me/e/20/xd2s)
-    # await session.commit()
-    # !
-    return new_offers
+        await session.rollback()
+    except SQLAlchemyError as e:
+        logger.error(
+            f"Database error while replacing offers for product {product_id}: {e}"
+        )
+        await session.rollback()
+    else:
+        return new_offers
