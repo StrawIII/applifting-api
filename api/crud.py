@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING, Iterable, cast
+from typing import Iterable, cast
+from uuid import UUID
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import HTTPException
@@ -62,10 +63,6 @@ async def read_product(
     statement = select(ProductORM).where(ProductORM.id == product_id)
     scalars = await session.scalars(statement)
     product = scalars.one_or_none()
-
-    if product is None:
-        raise HTTPException(status_code=404, detail="Product not found")
-
     return product
 
 
