@@ -35,6 +35,6 @@ jobs:
         if: matrix.python-version != '3.13'
         run: uv python install --python-preference only-managed ${{ matrix.python-version }}
       - name: Setup test suite
-        run: tox run -vv --notest --skip-missing-interpreters false
+        run: tox run -vv --skip-missing-interpreters false
         env:
           TOX_GH_MAJOR_MINOR: ${{ matrix.python-version }}
