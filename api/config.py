@@ -11,6 +11,8 @@ Seconds = NewType("Seconds", float)
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=find_dotenv(), extra="ignore")
 
+    environment: str
+
     project_name: str = "applifting-api"
     api_prefix: str = "/api/v1"
     refetch_interval: Seconds = Seconds(60.0)
