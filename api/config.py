@@ -1,3 +1,4 @@
+import os
 from typing import NewType
 
 import sqlalchemy
@@ -6,6 +7,8 @@ from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 Seconds = NewType("Seconds", float)
+
+print(os.environ)
 
 
 class Settings(BaseSettings):
