@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import uuid
 
 from sqlalchemy import ForeignKey
@@ -21,7 +19,7 @@ class ProductORM(Base):
     name: Mapped[str] = mapped_column(VARCHAR(50))
     description: Mapped[str] = mapped_column(TEXT)
 
-    offers: Mapped[list[OfferORM]] = relationship(
+    offers: Mapped[list["OfferORM"]] = relationship(
         back_populates="product", cascade="all, delete-orphan"
     )
 

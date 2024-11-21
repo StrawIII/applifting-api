@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 from asyncio import sleep
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast
 from uuid import UUID, uuid4
 
 import httpx
@@ -15,9 +13,7 @@ from api.config import Settings
 from api.crud import read_products, replace_offers
 from api.dependencies import Container
 from api.schemas.offer import Offer
-
-if TYPE_CHECKING:
-    from api.schemas.product import ProductCreate
+from api.schemas.product import ProductCreate
 
 
 @inject

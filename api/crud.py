@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Iterable, cast
 
 from dependency_injector.wiring import Provide, inject
@@ -12,13 +10,8 @@ from sqlalchemy.orm import selectinload
 
 from api.dependencies import Container
 from api.models import OfferORM, ProductORM
-from api.schemas.product import ProductUpdate
-
-if TYPE_CHECKING:
-    from uuid import UUID
-
-    from api.schemas.offer import Offer
-    from api.schemas.product import ProductCreate
+from api.schemas.offer import Offer
+from api.schemas.product import ProductCreate, ProductUpdate
 
 # TODO: implement more sofisticated Exception handling
 
