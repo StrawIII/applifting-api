@@ -29,7 +29,6 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Run tests
-        run: uv run tox
         env:
           APPLIFTING_API_BASE_URL: ${{ secrets.APPLIFTING_API_BASE_URL }}
           APPLIFTING_API_REFRESH_TOKEN: ${{ secrets.APPLIFTING_API_REFRESH_TOKEN }}
@@ -38,3 +37,4 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
+        run: uv run tox
