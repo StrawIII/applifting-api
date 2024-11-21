@@ -12,29 +12,29 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ["3.10", "3.11", "3.12", "3.13"]
-
+    env:
+      APPLIFTING_API_BASE_URL: ${{ secrets.APPLIFTING_API_BASE_URL }}
+      APPLIFTING_API_REFRESH_TOKEN: ${{ secrets.APPLIFTING_API_REFRESH_TOKEN }}
+      POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+      POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
       - name: Install uv
         uses: astral-sh/setup-uv@v3
-
-      - name: Install the project
-        run: uv sync --all-extras --dev
-
-      - name: Run tests
+      - name: Install tox
+        run: uv tool install --python-preference only-managed --python 3.13 tox --with tox-uv --with tox-gh
+      - name: Install Python
+        if: matrix.python-version != '3.13'
+        run: uv python install --python-preference only-managed ${{ matrix.python-version }}
+      - name: Setup test suite
+        run: tox run -vv --notest --skip-missing-interpreters false
         env:
-          APPLIFTING_API_BASE_URL: ${{ secrets.APPLIFTING_API_BASE_URL }}
-          APPLIFTING_API_REFRESH_TOKEN: ${{ secrets.APPLIFTING_API_REFRESH_TOKEN }}
-          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
-        run: uv run tox
+          TOX_GH_MAJOR_MINOR: ${{ matrix.python-version }}
