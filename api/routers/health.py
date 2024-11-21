@@ -1,8 +1,7 @@
 import asyncio
-from typing import cast
 
 from dependency_injector.wiring import Provide, inject
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,7 +17,7 @@ router = APIRouter()
     summary="Check whether API is running and connetcted to the database.",
 )
 @inject
-async def get_root(session=cast(AsyncSession, Provide[Container.session])) -> None:
+async def get_root(session: AsyncSession = Depends(Provide[Container.session])) -> None:
     try:
         await asyncio.wait_for(session.execute(text("SELECT 1;")), timeout=5)
     except (asyncio.TimeoutError, OperationalError) as e:
