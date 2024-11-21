@@ -64,6 +64,7 @@ class ProductUpdateIn(ProductBase):
 
 
 class ProductUpdateOut(ProductFromORM):
+    id: UUID
     name: str
     description: str
 

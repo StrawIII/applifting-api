@@ -88,6 +88,7 @@ def test_update_product(test_client, test_product_id):
     response = test_client.put(f"/products/{test_product_id}", json=request_body)
     response_body = response.json()
     assert response.status_code == status.HTTP_200_OK
+    assert response_body["id"] == str(test_product_id)
     assert response_body["name"] == request_body["name"]
     assert response_body["description"] == request_body["description"]
 
