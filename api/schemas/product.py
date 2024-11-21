@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, field_serializer
@@ -9,7 +10,14 @@ class ProductBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ProductCatalogue(ProductBase):
+class ProductFromORM(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    created_at: datetime
+    updated_at: datetime
+
+
+class ProductCatalogue(ProductFromORM):
     id: UUID
     name: str
     description: str
@@ -20,7 +28,7 @@ class ProductCatalogue(ProductBase):
         return str(value)
 
 
-class ProductCreate(ProductBase):
+class ProductCreateIn(ProductBase):
     id: UUID
     name: str
     description: str
@@ -30,7 +38,7 @@ class ProductCreate(ProductBase):
         return str(value)
 
 
-class ProductRead(ProductBase):
+class ProductCreateOut(ProductFromORM):
     id: UUID
     name: str
     description: str
@@ -40,7 +48,22 @@ class ProductRead(ProductBase):
         return str(value)
 
 
-class ProductUpdate(ProductBase):
+class ProductRead(ProductFromORM):
+    id: UUID
+    name: str
+    description: str
+
+    @field_serializer("id")
+    def serialize_id(self, value: UUID) -> str:
+        return str(value)
+
+
+class ProductUpdateIn(ProductBase):
+    name: str
+    description: str
+
+
+class ProductUpdateOut(ProductFromORM):
     name: str
     description: str
 

@@ -16,10 +16,12 @@ from api.dependencies import product_exists
 from api.schemas.offer import Offer
 from api.schemas.product import (
     ProductCatalogue,
-    ProductCreate,
+    ProductCreateIn,
+    ProductCreateOut,
     ProductDelete,
     ProductRead,
-    ProductUpdate,
+    ProductUpdateIn,
+    ProductUpdateOut,
 )
 from api.utils import fetch_product_offers, register_product
 
@@ -27,7 +29,7 @@ router = APIRouter()
 
 
 @router.get("/catalogue", summary="Get all products and their offers")
-async def get_catalogue_():
+async def get_catalogue_() -> list[ProductCatalogue]:
     products = await read_products_with_offers()
     return [
         ProductCatalogue(
@@ -35,6 +37,8 @@ async def get_catalogue_():
             name=product.name,
             description=product.description,
             offers=[Offer.model_validate(offer) for offer in product.offers],
+            created_at=product.created_at,
+            updated_at=product.updated_at,
         )
         for product in products
     ]
@@ -48,15 +52,15 @@ async def get_root_() -> list[ProductRead]:
 
 @router.post("", status_code=201, summary="Create a product")
 async def post_root_(
-    product: ProductCreate,
-) -> ProductCreate:
-    if os.getenv("ENVIRONMENT") != "testing":
-        registered_product = await register_product(product=product)
-    else:
+    product: ProductCreateIn,
+) -> ProductCreateOut:
+    if os.getenv("ENVIRONMENT") == "testing":
         registered_product = product
+    else:
+        registered_product = await register_product(product=product)
 
     created_product = await create_product(product=registered_product)
-    return ProductCreate.model_validate(created_product)
+    return ProductCreateOut.model_validate(created_product)
 
 
 @router.get(
@@ -73,10 +77,10 @@ async def get_product_(product_id: UUID) -> ProductRead:
 )
 async def put_product_(
     product_id: UUID,
-    product: ProductUpdate,
+    product: ProductUpdateIn,
 ):
     updated_product = await update_product(product_id=product_id, product=product)
-    return ProductUpdate.model_validate(updated_product)
+    return ProductUpdateOut.model_validate(updated_product)
 
 
 @router.delete(

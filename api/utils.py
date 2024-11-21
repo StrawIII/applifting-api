@@ -13,14 +13,14 @@ from api.config import Settings
 from api.crud import read_products, replace_offers
 from api.dependencies import Container
 from api.schemas.offer import Offer
-from api.schemas.product import ProductCreate
+from api.schemas.product import ProductCreateIn
 
 
 @inject
 async def register_product(
-    product: ProductCreate,
+    product: ProductCreateIn,
     client=cast(AsyncClient, Provide[Container.client]),
-) -> ProductCreate:
+) -> ProductCreateIn:
     try:
         response = await client.post(
             "/products/register",

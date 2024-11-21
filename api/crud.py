@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Iterable, cast
 from uuid import UUID
 
@@ -12,14 +14,14 @@ from sqlalchemy.orm import selectinload
 from api.dependencies import Container
 from api.models import OfferORM, ProductORM
 from api.schemas.offer import Offer
-from api.schemas.product import ProductCreate, ProductUpdate
+from api.schemas.product import ProductCreateIn, ProductUpdateIn
 
 # TODO: implement more sofisticated Exception handling
 
 
 @inject
 async def create_product(
-    product: ProductCreate,
+    product: ProductCreateIn,
     session=cast(AsyncSession, Provide[Container.session]),
 ) -> ProductORM:
     try:
@@ -31,10 +33,14 @@ async def create_product(
     except IntegrityError as e:
         logger.error(e)
         await session.rollback()
+        raise HTTPException(status_code=409, detail="Product ID already exists") from e
     except SQLAlchemyError as e:
         logger.error(e)
         await session.rollback()
-        raise HTTPException from e
+        raise HTTPException(
+            status_code=500,
+            detail="Error while creating the product. Please try again later.",
+        ) from e
 
 
 @inject
@@ -69,7 +75,7 @@ async def read_product(
 @inject
 async def update_product(
     product_id: UUID,
-    product: ProductUpdate,
+    product: ProductUpdateIn,
     session=cast(AsyncSession, Provide[Container.session]),
 ) -> ProductORM:
     updated_product = await session.merge(
@@ -118,7 +124,11 @@ async def replace_offers(
     await session.execute(statement)
 
     new_offers = [
-        OfferORM(**offer.model_dump(), product_id=product_id)
+        OfferORM(
+            **offer.model_dump(exclude={"id"}),
+            id=offer.id if isinstance(offer.id, UUID) else UUID(offer.id),
+            product_id=product_id,
+        )
         for offer in offers
         if offer.items_in_stock > 0
     ]
