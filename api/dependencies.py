@@ -19,10 +19,10 @@ async def _session() -> AsyncGenerator[AsyncSession, Any]:
         yield session
 
 
-async def product_exists(product_id: UUID, session: "SessionDep") -> None:
-    statement = select(ProductORM).where(ProductORM.id == product_id)
-    scalars = await session.scalars(statement)
-    product = scalars.one_or_none()
+async def product_exists(product_id: UUID) -> None:
+    from api.crud import read_product
+
+    product = await read_product(product_id=product_id)
 
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
