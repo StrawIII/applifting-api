@@ -38,5 +38,5 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
         run: |
-          echo ${{ secrets.APPLIFTING_API_BASE_URL }}
+          printenv
           uv run tox
