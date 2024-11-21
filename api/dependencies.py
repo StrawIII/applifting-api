@@ -1,9 +1,9 @@
-from typing import Annotated, Any, AsyncGenerator
+from typing import Any, AsyncGenerator
 from uuid import UUID
 
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Resource, Singleton
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.client import client
@@ -24,9 +24,6 @@ async def product_exists(product_id: UUID) -> None:
 
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
-
-
-SessionDep = Annotated[AsyncSession, Depends(_session)]
 
 
 class Container(DeclarativeContainer):

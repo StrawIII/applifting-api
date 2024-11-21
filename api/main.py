@@ -16,7 +16,7 @@ from api.routers import health, products
 from api.utils import fetch_loop
 
 container = Container()
-container.wire(modules=[utils, crud])
+container.wire(modules=[utils, crud, health])
 
 
 @asynccontextmanager
