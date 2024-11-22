@@ -1,9 +1,7 @@
 name: Test
-
 on:
   - push
   - pull_request
-
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -29,9 +27,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install uv
         uses: astral-sh/setup-uv@v3
-      - name: Install tox
-        run: uv tool install tox --with tox-uv --with tox-gh
       - name: Setup test suite
-        run: tox run -vv --skip-missing-interpreters false
+        run: uvx --with tox-uv --with tox-gh tox run -vv --skip-missing-interpreters false
         env:
           TOX_GH_MAJOR_MINOR: ${{ matrix.python-version }}
