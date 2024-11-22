@@ -78,5 +78,5 @@ docker compose -f compose.dev.yaml up --build
 ### Run tests
 
 ```bash
-uv run tox
+uv run tox run
 ```
