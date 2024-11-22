@@ -21,8 +21,6 @@ from api.models import OfferORM, ProductORM
 from api.schemas.offer import Offer
 from api.schemas.product import ProductCreateIn, ProductUpdateIn
 
-# TODO: implement more sofisticated Exception handling
-
 
 @inject
 async def create_product(
