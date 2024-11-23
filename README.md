@@ -1,13 +1,3 @@
-# TODO
-- [x] Deploy on render.com
-  - [x] PostgreSQL
-  - [x] API
-- [ ] Improve logging and exception handling
-- [ ] Implement simple AUTH
-- [x] Add more tests
-- [x] Implement tox
-- [x] Implement alembic
-
 # Applifting API
 
 ![Tests](https://github.com/StrawIII/applifting-api/actions/workflows/test.yml/badge.svg)
