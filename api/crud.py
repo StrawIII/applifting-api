@@ -181,7 +181,6 @@ async def replace_offers(
             if offer.items_in_stock > 0
         ]
         session.add_all(new_offers)
-        await session.commit()
     except IntegrityError as e:
         logger.error(
             f"Integrity error while replacing offers for product {product_id}: {e}"
