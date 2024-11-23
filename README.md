@@ -1,6 +1,7 @@
 # Applifting API
 
 ![Tests](https://github.com/StrawIII/applifting-api/actions/workflows/test.yml/badge.svg)
+![Build](https://github.com/StrawIII/applifting-api/actions/workflows/docker-publish.yml/badge.svg)
 ![License](https://img.shields.io/github/license/StrawIII/applifting-api)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-✔-green)
