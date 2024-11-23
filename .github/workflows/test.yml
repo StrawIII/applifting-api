@@ -14,8 +14,6 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DATABASE }}
@@ -24,11 +22,13 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 5432:5432
     env:
       APPLIFTING_API_BASE_URL: ${{ secrets.APPLIFTING_API_BASE_URL }}
       APPLIFTING_API_REFRESH_TOKEN: ${{ secrets.APPLIFTING_API_REFRESH_TOKEN }}
       POSTGRES_HOST: localhost
-      POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+      POSTGRES_PORT: 5432
       POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
