@@ -59,7 +59,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "sqlalchemy", extra = ["asyncio"] },
-    { name = "uvloop" },
+    { name = "uvloop", marker = "sys_platform != 'win32'" },
 ]
 
 [package.dev-dependencies]
@@ -83,7 +83,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.9.2" },
     { name = "pydantic-settings", specifier = ">=2.6.1" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.36" },
-    { name = "uvloop", specifier = ">=0.21.0" },
+    { name = "uvloop", marker = "sys_platform != 'win32'", specifier = ">=0.21.0" },
 ]
 
 [package.metadata.requires-dev]
