@@ -14,9 +14,9 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DATABASE }}
+          POSTGRES_USER: applifting
+          POSTGRES_PASSWORD: applifting
+          POSTGRES_DB: applifting
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -29,9 +29,9 @@ jobs:
       APPLIFTING_API_REFRESH_TOKEN: ${{ secrets.APPLIFTING_API_REFRESH_TOKEN }}
       POSTGRES_HOST: localhost
       POSTGRES_PORT: 5432
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
+      POSTGRES_USER: applifting
+      POSTGRES_PASSWORD: applifting
+      POSTGRES_DATABASE: applifting
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
