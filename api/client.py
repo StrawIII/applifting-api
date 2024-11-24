@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import AsyncGenerator
 
 import httpx
@@ -13,6 +14,9 @@ class BearerAuth(Auth):
         self.base_url = base_url
         self.refresh_token = refresh_token
         self.access_token = ""
+
+        if settings.environment == "development":
+            self.access_token = Path(".token").read_text()
 
     async def async_auth_flow(
         self,
@@ -32,6 +36,9 @@ class BearerAuth(Auth):
             # refresh the access token, and resend the request.
             logger.info("Refreshing access token...")
             self.access_token = await self.fetch_access_token()
+
+            if settings.environment == "development":
+                Path(".token").write_text(self.access_token)
 
             request.headers["Bearer"] = self.access_token
             yield request
