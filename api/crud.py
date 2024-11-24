@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, cast
+from typing import Iterable
 from uuid import UUID
 
 from dependency_injector.wiring import Provide, inject
@@ -25,7 +25,7 @@ from api.schemas.product import ProductCreateIn, ProductUpdateIn
 @inject
 async def create_product(
     product: ProductCreateIn,
-    session=cast(AsyncSession, Provide[Container.session]),
+    session: AsyncSession = Provide[Container.session],
 ) -> ProductORM:
     try:
         created_product = ProductORM(**product.model_dump())
@@ -56,7 +56,7 @@ async def create_product(
 
 @inject
 async def read_products(
-    session=cast(AsyncSession, Provide[Container.session]),
+    session: AsyncSession = Provide[Container.session],
 ) -> Iterable[ProductORM]:
     statement = select(ProductORM)
     scalars = await session.scalars(statement=statement)
@@ -65,7 +65,7 @@ async def read_products(
 
 @inject
 async def read_products_with_offers(
-    session=cast(AsyncSession, Provide[Container.session]),
+    session: AsyncSession = Provide[Container.session],
 ) -> Iterable[ProductORM]:
     statement = select(ProductORM).options(selectinload(ProductORM.offers))
     scalars = await session.scalars(statement=statement)
@@ -75,8 +75,9 @@ async def read_products_with_offers(
 
 @inject
 async def read_product(
-    product_id: UUID, session=cast(AsyncSession, Provide[Container.session])
-) -> ProductORM:
+    product_id: UUID,
+    session: AsyncSession = Provide[Container.session],
+) -> ProductORM | None:
     try:
         statement = select(ProductORM).where(ProductORM.id == product_id)
         scalars = await session.scalars(statement)
@@ -94,7 +95,7 @@ async def read_product(
 async def update_product(
     product_id: UUID,
     product: ProductUpdateIn,
-    session=cast(AsyncSession, Provide[Container.session]),
+    session: AsyncSession = Provide[Container.session],
 ) -> ProductORM:
     try:
         updated_product = await session.merge(
@@ -131,7 +132,8 @@ async def update_product(
 
 @inject
 async def delete_product(
-    product: ProductORM, session=cast(AsyncSession, Provide[Container.session])
+    product: ProductORM,
+    session: AsyncSession = Provide[Container.session],
 ) -> ProductORM:
     try:
         await session.delete(product)
@@ -154,7 +156,8 @@ async def delete_product(
 
 @inject
 async def read_offers(
-    product_id: UUID, session=cast(AsyncSession, Provide[Container.session])
+    product_id: UUID,
+    session: AsyncSession = Provide[Container.session],
 ) -> Iterable[OfferORM]:
     statement = select(OfferORM).where(OfferORM.product_id == product_id)
     scalars = await session.scalars(statement)
@@ -165,7 +168,7 @@ async def read_offers(
 async def replace_offers(
     product_id: UUID,
     offers: list[Offer],
-    session=cast(AsyncSession, Provide[Container.session]),
+    session: AsyncSession = Provide[Container.session],
 ) -> Iterable[OfferORM]:
     try:
         statement = delete(OfferORM).where(OfferORM.product_id == product_id)

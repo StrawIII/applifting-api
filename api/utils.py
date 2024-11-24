@@ -19,7 +19,7 @@ from api.schemas.product import ProductCreateIn
 @inject
 async def register_product(
     product: ProductCreateIn,
-    client=cast(AsyncClient, Provide[Container.client]),
+    client: AsyncClient = Provide[Container.client],
 ) -> ProductCreateIn:
     try:
         response = await client.post(
@@ -52,7 +52,7 @@ async def register_product(
 
 @inject
 async def fetch_product_offers(
-    product_id: UUID, client=cast(AsyncClient, Provide[Container.client])
+    product_id: UUID, client: AsyncClient = Provide[Container.client]
 ) -> list[Offer]:
     try:
         response = await client.get(f"/products/{product_id}/offers")
@@ -77,8 +77,8 @@ async def fetch_product_offers(
 
 @inject
 async def fetch_loop(
-    settings=cast(Settings, Provide[Container.settings]),
-    session=cast(AsyncSession, Provide[Container.session]),
+    settings: Settings = Provide[Container.settings],
+    session: AsyncSession = Provide[Container.session],
 ) -> None:
     while True:
         products = await read_products()
