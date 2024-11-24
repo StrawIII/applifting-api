@@ -8,6 +8,9 @@ from loguru import logger
 
 from api.config import settings
 
+access_token_file = Path(".token")
+access_token_file.touch()
+
 
 class BearerAuth(Auth):
     def __init__(self, base_url: str, refresh_token: str) -> None:
@@ -15,8 +18,9 @@ class BearerAuth(Auth):
         self.refresh_token = refresh_token
         self.access_token = ""
 
+        # ? using a file because environment variables are not persistent between processes
         if settings.environment == "development":
-            self.access_token = Path(".token").read_text()
+            self.access_token = access_token_file.read_text()
 
     async def async_auth_flow(
         self,
@@ -38,7 +42,7 @@ class BearerAuth(Auth):
             self.access_token = await self.fetch_access_token()
 
             if settings.environment == "development":
-                Path(".token").write_text(self.access_token)
+                access_token_file.write_text(self.access_token)
 
             request.headers["Bearer"] = self.access_token
             yield request
