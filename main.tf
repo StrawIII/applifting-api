@@ -1,4 +1,4 @@
-# render.com currently does not support terraform for free plan
+# terraform is not supported in render.com free plan
 terraform {
   required_providers {
     render = {
@@ -8,14 +8,24 @@ terraform {
   }
 }
 
+variable "plan" {
+  type    = string
+  default = "free"
+}
+
+variable "region" {
+  type    = string
+  default = "frankfurt"
+}
+
 provider "render" {
   wait_for_deploy_completion = true
 }
 
 resource "render_postgres" "applifting_api_database" {
   name          = "applifting-api-db"
-  plan          = "free"
-  region        = "frankfurt"
+  plan          = var.plan
+  region        = var.region
   version       = "16"
   database_name = "applifting"
   database_user = "applifting"
@@ -23,8 +33,8 @@ resource "render_postgres" "applifting_api_database" {
 
 resource "render_web_service" "applifting_api_app" {
   name   = "applifting-api-app"
-  plan   = "free"
-  region = "frankfurt"
+  plan   = var.plan
+  region = var.region
   runtime_source = {
     docker = {
       branch          = "main"
