@@ -7,6 +7,7 @@ from loguru import logger
 from api.crud import (
     create_product,
     delete_product,
+    read_offers,
     read_product,
     read_products,
     read_products_with_offers,
@@ -98,7 +99,4 @@ async def delete_product_(product_id: UUID) -> ProductDelete:
     summary="Get product offers",
 )
 async def get_products_offers(product_id: UUID) -> list[Offer]:
-    return [
-        Offer.model_validate(offer)
-        for offer in await fetch_product_offers(product_id=product_id)
-    ]
+    return await read_offers(product_id=product_id)
