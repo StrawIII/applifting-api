@@ -23,7 +23,10 @@ async def lifespan(_: FastAPI) -> AsyncGenerator[FastAPI, None]:
     subprocess.run(["alembic", "upgrade", "head"], check=True)
 
     if os.getenv("ENVIRONMENT") != "testing":
-        asyncio.create_task(fetch_loop(), name="fetch_loop")
+        backgroud_tasks = set()
+        task = asyncio.create_task(fetch_loop(), name="fetch_loop")
+        background_tasks.add(task)
+        task.add_done_callback(background_tasks.discard)
 
     try:
         yield
