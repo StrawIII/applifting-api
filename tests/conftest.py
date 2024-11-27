@@ -25,5 +25,4 @@ def test_product_id(test_client) -> Generator[UUID, Any, None]:
         },
     )
     yield product_id
-    # if not testing in a container
     test_client.delete(f"/products/{product_id}")
