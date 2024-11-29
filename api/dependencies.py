@@ -2,7 +2,7 @@ from typing import Any, AsyncGenerator
 from uuid import UUID
 
 from dependency_injector.containers import DeclarativeContainer
-from dependency_injector.providers import Resource, Singleton
+from dependency_injector.providers import Object, Resource
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,9 +27,9 @@ async def product_exists(product_id: UUID) -> None:
 
 
 class Container(DeclarativeContainer):
-    settings = Singleton(lambda: settings)
+    settings = Object(settings)
     session = Resource(_session)
-    client = Singleton(lambda: client)
+    client = Object(client)
 
 
 class TestContainer(DeclarativeContainer): ...
