@@ -7,10 +7,11 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-✔-green)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-✔-blue)
 
-### 👷 **Deployed demo**: [https://applifting-api.onrender.com](https://applifting-api.onrender.com) 
-Docs (Swagger): [https://applifting-api.onrender.com/docs](https://applifting-api.onrender.com/docs) 
+👷 **Deployed demo**: [https://applifting-api.onrender.com](https://applifting-api.onrender.com) 
 
-🚨ATTENTION: first request might take up to a minute due to server spin up🚨
+📝 **Docs (Swagger)**: [https://applifting-api.onrender.com/docs](https://applifting-api.onrender.com/docs) 
+
+🚨 first request might take more than a minute due to server spin up 🚨
 
 ## Overview
 
