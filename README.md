@@ -11,7 +11,8 @@
 
 📝 **Docs (Swagger)**: [https://applifting-api.onrender.com/docs](https://applifting-api.onrender.com/docs) 
 
-🚨 first request might take more than a minute due to server spin up 🚨
+> [!IMPORTANT]  
+> First request might take more than a minute due to server spin up.
 
 ## Overview
 
