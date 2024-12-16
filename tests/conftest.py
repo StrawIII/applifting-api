@@ -4,12 +4,13 @@ from uuid import UUID, uuid4
 import pytest
 from fastapi.testclient import TestClient
 
+from api.config import settings
 from api.main import app
 
 
 @pytest.fixture(scope="session")
 def test_client() -> Generator[TestClient, Any, None]:
-    with TestClient(app, base_url="http://testserver/api/v1") as client:
+    with TestClient(app, base_url=f"http://testserver{settings.api_prefix}") as client:
         yield client
 
 
