@@ -47,7 +47,7 @@ resource "render_web_service" "applifting_api_app" {
   secret_files = {
     ".env" = { content = file("${path.module}/.env") }
   }
-  # TODO: set environment variables to match "applifting_api_database" (e.g. adress, user, etc.)
+  # TODO: set environment variables to match "applifting_api_database" (e.g. address, user, etc.)
   env_vars = {
     "key1" = { value = "val1" },
     "key2" = { value = "val2" },
